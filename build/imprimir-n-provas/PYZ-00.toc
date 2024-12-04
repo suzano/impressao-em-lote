@@ -148,6 +148,7 @@
   ('tkinter.simpledialog',
    '/usr/lib/python3.11/tkinter/simpledialog.py',
    'PYMODULE'),
+  ('tkinter.ttk', '/usr/lib/python3.11/tkinter/ttk.py', 'PYMODULE'),
   ('token', '/usr/lib/python3.11/token.py', 'PYMODULE'),
   ('tokenize', '/usr/lib/python3.11/tokenize.py', 'PYMODULE'),
   ('tracemalloc', '/usr/lib/python3.11/tracemalloc.py', 'PYMODULE'),

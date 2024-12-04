@@ -33,7 +33,7 @@ import os
 import platform
 import time
 import subprocess
-from tkinter import Tk, filedialog, messagebox, StringVar, Label, Button, OptionMenu, ttk, PhotoImage
+from tkinter import Tk, filedialog, messagebox, StringVar, Label, Button, OptionMenu, Canvas, PhotoImage, ttk
 
 def listar_impressoras():
     """Lista as impressoras instaladas no sistema."""
@@ -78,18 +78,17 @@ def imprimir_arquivos():
             messagebox.showinfo("Aviso", "Nenhum arquivo PDF encontrado na pasta.")
             return
 
-        progress_bar["maximum"] = len(arquivos)
-        for i, arquivo in enumerate(arquivos, start=1):
+        progress_bar["maximum"] = len(arquivos)  # Configura o número máximo da barra de progresso
+        for idx, arquivo in enumerate(arquivos):
             if os_name == "Windows":
                 imprimir_windows(arquivo, impressora_selecionada)
             elif os_name == "Linux":
                 imprimir_linux(arquivo, impressora_selecionada)
             time.sleep(20)  # Pausa de 20 segundos entre as impressões
-            progress_bar["value"] = i
-            progress_bar.update()
-
+            progress_bar["value"] = idx + 1  # Atualiza a barra de progresso
+            root.update_idletasks()
+        
         messagebox.showinfo("Sucesso", "Todos os arquivos foram enviados para a impressão!")
-        progress_bar["value"] = 0
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
 
@@ -107,23 +106,25 @@ def listar_arquivos(pasta):
 os_name = platform.system()
 
 # Configurações de layout
-janela_largura = 400
+janela_largura = 700
 janela_altura = 300
 
 # Interface gráfica
 root = Tk()
 root.title("Impressão de PDFs em Lote")
 root.geometry(f"{janela_largura}x{janela_altura}")
+root.resizable(False, False)  # Tamanho fixo da janela
 
 # Variáveis globais
-pasta_var = StringVar()
-impressora_var = StringVar()
+pasta_var = StringVar(value="Nenhuma pasta selecionada")
+impressora_var = StringVar(value="Nenhuma impressora selecionada")
 caminho = ""
 impressora_selecionada = None
 
 # Widgets
 Label(root, text="Selecione a pasta com os arquivos PDF:").pack(pady=5)
 Button(root, text="Selecionar Pasta", command=selecionar_pasta).pack(pady=5)
+Label(root, textvariable=pasta_var, wraplength=380).pack(pady=5)
 
 Label(root, text="Selecione a impressora:").pack(pady=5)
 impressoras = listar_impressoras()
@@ -131,25 +132,28 @@ if impressoras:
     impressora_var.set(impressoras[0])  # Seleciona a primeira impressora como padrão
 OptionMenu(root, impressora_var, *impressoras).pack(pady=5)
 
-Button(root, text="Confirmar Impressora", command=lambda: confirmar_impressora(impressora_var.get())).pack(pady=5)
-Button(root, text="Imprimir Arquivos", command=imprimir_arquivos, bg="green", fg="white").pack(pady=10)
-
-# Barra de progresso
-progress_bar = ttk.Progressbar(root, orient="horizontal", length=300, mode="determinate")
-progress_bar.pack(pady=10)
-
-# Imagem no canto inferior esquerdo
-try:
-    img = PhotoImage(file="icone.png")  # Substitua 'icone.png' pelo caminho para sua imagem
-    Label(root, image=img).place(x=10, y=janela_altura - 60)  # Ajuste as coordenadas conforme necessário
-except Exception as e:
-    print(f"Erro ao carregar a imagem: {e}")
-
-# Confirmar impressora selecionada
 def confirmar_impressora(impressora):
     global impressora_selecionada
     impressora_selecionada = impressora
     messagebox.showinfo("Impressora Selecionada", f"Impressora escolhida: {impressora}")
+    impressora_var.set(impressora)
+
+Button(root, text="Aplicar", command=lambda: confirmar_impressora(impressora_var.get()), bg="blue", fg="white").pack(pady=5)
+
+Button(root, text="Imprimir Arquivos", command=imprimir_arquivos, bg="green", fg="white").pack(pady=10)
+
+# Barra de Progresso
+progress_bar = ttk.Progressbar(root, orient="horizontal", length=350, mode="determinate")
+progress_bar.pack(pady=5)
+
+# Exibição da imagem no canto inferior esquerdo
+canvas = Canvas(root, width=150, height=150)
+canvas.place(x=10, y=150)  # Posição fixa no canto inferior esquerdo
+try:
+    img = PhotoImage(file="impressora.png")  # Caminho da imagem
+    canvas.create_image(0, 0, anchor="nw", image=img)
+except Exception:
+    Label(root, text="Imagem não encontrada", fg="red").place(x=10, y=270)
 
 # Loop principal
 root.mainloop()
