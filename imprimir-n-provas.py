@@ -1,3 +1,35 @@
+################################################################################
+# Program Name: imprimir-n-provas.py
+# Description: Programa para impressão de arquivos em lote.
+# Author: Suzano Bitencourt
+# Date: 01/12/2024
+# Version: 1.0
+# License: GPL-3.0
+# Usage: 
+#   ./imprimir-n-provas.exe
+#
+# Requirements:
+#   - Sistema Linux ou Windows
+#   - Python 3
+#
+# Features:
+#   1. Lista as impressoras instaladas no Sistema Linux e Windows
+#   2. Lista os arquivos presentes na pasta provas
+#   3. Interface permite escolher outra pasta com arquivos a serem impressos
+#   4. Interface permite escolher qual impressora sera usada para impressão
+#   5. Faz a impressão de todos os arquivos da pasta com intervalo de 
+#      20 segundos entre os arquivos.
+#
+# Example:
+#   ./imprimir-n-provas
+#
+# Notes:
+#   - Testes no Debian 12
+#   - Testes no Windows 10
+#
+################################################################################
+
+
 import os
 import platform
 import time
