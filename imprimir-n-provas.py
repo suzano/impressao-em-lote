@@ -29,12 +29,11 @@
 #
 ################################################################################
 
-
 import os
 import platform
 import time
 import subprocess
-from tkinter import Tk, filedialog, messagebox, StringVar, Label, Button, OptionMenu
+from tkinter import Tk, filedialog, messagebox, StringVar, Label, Button, OptionMenu, ttk, PhotoImage
 
 def listar_impressoras():
     """Lista as impressoras instaladas no sistema."""
@@ -79,13 +78,18 @@ def imprimir_arquivos():
             messagebox.showinfo("Aviso", "Nenhum arquivo PDF encontrado na pasta.")
             return
 
-        for arquivo in arquivos:
+        progress_bar["maximum"] = len(arquivos)
+        for i, arquivo in enumerate(arquivos, start=1):
             if os_name == "Windows":
                 imprimir_windows(arquivo, impressora_selecionada)
             elif os_name == "Linux":
                 imprimir_linux(arquivo, impressora_selecionada)
             time.sleep(20)  # Pausa de 20 segundos entre as impressões
+            progress_bar["value"] = i
+            progress_bar.update()
+
         messagebox.showinfo("Sucesso", "Todos os arquivos foram enviados para a impressão!")
+        progress_bar["value"] = 0
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
 
@@ -128,7 +132,18 @@ if impressoras:
 OptionMenu(root, impressora_var, *impressoras).pack(pady=5)
 
 Button(root, text="Confirmar Impressora", command=lambda: confirmar_impressora(impressora_var.get())).pack(pady=5)
-Button(root, text="Imprimir Arquivos", command=imprimir_arquivos, bg="green", fg="white").pack(pady=20)
+Button(root, text="Imprimir Arquivos", command=imprimir_arquivos, bg="green", fg="white").pack(pady=10)
+
+# Barra de progresso
+progress_bar = ttk.Progressbar(root, orient="horizontal", length=300, mode="determinate")
+progress_bar.pack(pady=10)
+
+# Imagem no canto inferior esquerdo
+try:
+    img = PhotoImage(file="icone.png")  # Substitua 'icone.png' pelo caminho para sua imagem
+    Label(root, image=img).place(x=10, y=janela_altura - 60)  # Ajuste as coordenadas conforme necessário
+except Exception as e:
+    print(f"Erro ao carregar a imagem: {e}")
 
 # Confirmar impressora selecionada
 def confirmar_impressora(impressora):
